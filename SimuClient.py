@@ -1,8 +1,7 @@
 import socket  # Hlavní modul pro funkci serveru
 from threading import Thread  # Více procesů zároveň
-import tkinter
+import tkinter  # GUI
 from tkinter import messagebox
-from tkinter import ttk
 
 
 def recv():
@@ -31,21 +30,22 @@ def on_closing(event=None):
     send()
 
 
+# Kostra GUI
 top = tkinter.Tk()
 top.title('Komunikace simulace 2022 by Oto')
 top.geometry("770x450")
-
 messages_frame = tkinter.Frame(top)
 my_msg = tkinter.StringVar()  # For the messages to be sent.
 scrollbar = tkinter.Scrollbar(messages_frame)  # To navigate through past messages.
 
-# Following will contain the messages.
+# Listbox který obsahuje zprávy
 msg_list = tkinter.Listbox(messages_frame, yscrollcommand=scrollbar.set)
 scrollbar.pack(side=tkinter.RIGHT, fill=tkinter.Y)
 messages_frame.pack(fill=tkinter.BOTH, expand=True)
 msg_list.pack(padx=10, pady=10, fill=tkinter.BOTH, expand=True)
 msg_list.config(font=("Unispace", 11))
 
+# Řádek na psaní a tlačítko odeslat
 entry_field = tkinter.Entry(top, textvariable=my_msg)
 entry_field.bind("<Return>", send)
 entry_field.pack(padx=10, fill=tkinter.X)
