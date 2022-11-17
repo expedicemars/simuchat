@@ -1,60 +1,69 @@
 import socket  # Hlavní modul pro funkci serveru
-import sys
-import time
 from threading import Thread  # Více procesů zároveň
-from datetime import datetime  # Pro zaznamenání času odeslání zprávy
+import tkinter
+from tkinter import messagebox
+from tkinter import ttk
 
 
 def recv():
     while True:
         try:
             data = client_socket.recv(1024).decode()  # Zkouší obdržet zprávu
-            if not data:
-                sys.exit(0)
-            print(str(data))
-        except ConnectionResetError:
-            print('Spojení se serverem bylo ztraceno')
-            time.sleep(1)
-            print(f"Čekám na opětovné připojení...")
+            msg_list.insert(tkinter.END, data)
+        except OSError:
+            break
+
+
+def send(event=None):
+    try:
+        message = my_msg.get()  # Napiš zprávu
+        my_msg.set('')
+        client_socket.send(bytes(message, 'utf8'))  # Odesílá zprávu serveru
+        if message == 'quit':
             client_socket.close()
-            break
+            top.quit()
+    except ConnectionResetError:
+        messagebox.showerror('Python Error', 'Error: Spojení se serverem bylo ztraceno!')
 
 
-def send():
-    while True:
-        try:
-            message = input()  # Napiš zprávu
-            date_now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            message = f"[{date_now}] {name}: {message}"  # Formátování zprávy
-            client_socket.send(message.encode())  # Odesílá zprávu klientovi
-
-        except ConnectionError:
-            print('Zpráva nebyla odeslána, server nenalezen...')
-            break
+def on_closing(event=None):
+    my_msg.set("quit")
+    send()
 
 
-def client_program():
-    while True:
-        try:
-            print(f"[*] Připojuji se k {SERVER_HOST}:{SERVER_PORT}...")
-            client_socket.connect((SERVER_HOST, SERVER_PORT))  # Připojení k serveru
-            print("[*] Připojeno.")
+top = tkinter.Tk()
+top.title('Komunikace simulace 2022 by Oto')
+top.geometry("770x450")
 
-            Thread(target=send).start()  # Zapne thready s odesíláním a přijímáním zpráv
-            Thread(target=recv).start()
+messages_frame = tkinter.Frame(top)
+my_msg = tkinter.StringVar()  # For the messages to be sent.
+scrollbar = tkinter.Scrollbar(messages_frame)  # To navigate through past messages.
 
-        except ConnectionError:
-            print("K zadané IP adrese se nelze připojit.")
-            time.sleep(1)
-            print("Zkouším znovu za 5 sekund...")
-            time.sleep(5)
-            break
+# Following will contain the messages.
+msg_list = tkinter.Listbox(messages_frame, yscrollcommand=scrollbar.set)
+scrollbar.pack(side=tkinter.RIGHT, fill=tkinter.Y)
+messages_frame.pack(fill=tkinter.BOTH, expand=True)
+msg_list.pack(padx=10, pady=10, fill=tkinter.BOTH, expand=True)
+msg_list.config(font=("Unispace", 11))
+
+entry_field = tkinter.Entry(top, textvariable=my_msg)
+entry_field.bind("<Return>", send)
+entry_field.pack(padx=10, fill=tkinter.X)
+send_button = tkinter.Button(top, text="Odeslat", command=send)
+send_button.pack()
+
+top.protocol("WM_DELETE_WINDOW", on_closing)
 
 if __name__ == '__main__':
     # IP adresa serveru, zjistíte pomocí Win+R -> ipconfig -> IPv4 Address
     # 127.0.0.1 pro local server
     SERVER_HOST = "127.0.0.1"
-    SERVER_PORT = 5002
-    name = 'Posádka'  # Jméno zobrazené u zprávy
+    SERVER_PORT = 5003
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # Pouze přejmenované na client pro lepší vyznání
-    client_program()  # Spustí celý program
+    try:
+        client_socket.connect((SERVER_HOST, SERVER_PORT))
+        receive_thread = Thread(target=recv)
+        receive_thread.start()
+        tkinter.mainloop()
+    except ConnectionRefusedError:
+        messagebox.showerror('Python Error', 'Error: Server nebyl nalezen!')
