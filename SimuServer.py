@@ -59,11 +59,11 @@ if __name__ == '__main__':
     addresses = {}
     clientslist = []
     # IP adresa serveru
-    SERVER_HOST = "0.0.0.0"
-    SERVER_PORT = 5003
+    SERVER_HOST = input('IP:')
+    SERVER_PORT = int(input('Port:'))
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # Pouze přejmenované na server pro lepší vyznání
     server_socket.bind((SERVER_HOST, SERVER_PORT))  # Spojí host adresu a port dohromady
-    server_socket.listen(5)  # Poslouchá pro 'x' zařízení
+    server_socket.listen(10)  # Poslouchá pro 'x' zařízení
 
     ACCEPT_THREAD = Thread(target=accept_connection)
     ACCEPT_THREAD.start()
