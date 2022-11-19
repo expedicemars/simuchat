@@ -22,6 +22,7 @@ def send(event=None):
             client_socket.close()
             top.quit()
     except ConnectionResetError:
+        top.withdraw()
         messagebox.showerror('Python Error', 'Error: Spojení se serverem bylo ztraceno!')
 
 
@@ -30,35 +31,42 @@ def on_closing(event=None):
     send()
 
 
+SERVER_HOST = input('IP:')
+SERVER_PORT = int(input('Port:'))
+
 # Kostra GUI
 top = tkinter.Tk()
-top.title('Komunikace simulace 2022 by Oto')
+top.title('SimuComm22')
 top.geometry("770x450")
-messages_frame = tkinter.Frame(top)
+
+messages_frame = tkinter.Frame(top, bg='orange')
+
+
+#messages_frame['bg'] = 'black'
 my_msg = tkinter.StringVar()  # For the messages to be sent.
-scrollbar = tkinter.Scrollbar(messages_frame)  # To navigate through past messages.
+scrollbar = tkinter.Scrollbar(top, bg="#26242f")  # To navigate through past messages.
 
 # Listbox který obsahuje zprávy
-msg_list = tkinter.Listbox(messages_frame, yscrollcommand=scrollbar.set)
+msg_list = tkinter.Listbox(messages_frame, bg="#26242f", fg='white', yscrollcommand=scrollbar.set)
 scrollbar.pack(side=tkinter.RIGHT, fill=tkinter.Y)
 messages_frame.pack(fill=tkinter.BOTH, expand=True)
-msg_list.pack(padx=10, pady=10, fill=tkinter.BOTH, expand=True)
-msg_list.config(font=("Unispace", 11))
+msg_list.pack(padx=7, pady=7, fill=tkinter.BOTH, expand=True)
+msg_list.config(font=("Unispace", 10))
 
 # Řádek na psaní a tlačítko odeslat
-entry_field = tkinter.Entry(top, textvariable=my_msg)
+entry_field = tkinter.Entry(messages_frame, textvariable=my_msg, bg="#26242f", fg='white')
 entry_field.bind("<Return>", send)
-entry_field.pack(padx=10, fill=tkinter.X)
-send_button = tkinter.Button(top, text="Odeslat", command=send)
-send_button.pack()
+entry_field.pack(padx=7, ipady=2, ipadx=265, side=tkinter.LEFT)
+entry_field.config(font=('Arial', 10))
+send_button = tkinter.Button(messages_frame, text="Odeslat", command=send, bg="#26242f", fg='white')
+send_button.pack(padx=7, side=tkinter.LEFT)
 
 top.protocol("WM_DELETE_WINDOW", on_closing)
 
 if __name__ == '__main__':
     # IP adresa serveru, zjistíte pomocí Win+R -> ipconfig -> IPv4 Address
     # 127.0.0.1 pro local server
-    SERVER_HOST = "127.0.0.1"
-    SERVER_PORT = 5003
+
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # Pouze přejmenované na client pro lepší vyznání
     try:
         client_socket.connect((SERVER_HOST, SERVER_PORT))
@@ -66,4 +74,5 @@ if __name__ == '__main__':
         receive_thread.start()
         tkinter.mainloop()
     except ConnectionRefusedError:
+        top.withdraw()
         messagebox.showerror('Python Error', 'Error: Server nebyl nalezen!')
