@@ -43,11 +43,12 @@ messages_frame = tkinter.Frame(top, bg='orange')
 
 
 #messages_frame['bg'] = 'black'
-my_msg = tkinter.StringVar()  # For the messages to be sent.
-scrollbar = tkinter.Scrollbar(top, bg="#26242f")  # To navigate through past messages.
+my_msg = tkinter.StringVar()
+scrollbar = tkinter.Scrollbar(messages_frame)
 
 # Listbox který obsahuje zprávy
-msg_list = tkinter.Listbox(messages_frame, bg="#26242f", fg='white', yscrollcommand=scrollbar.set)
+msg_list = tkinter.Listbox(messages_frame, yscrollcommand=scrollbar.set, bg="#26242f", fg='white')
+scrollbar.config(command=msg_list.yview)
 scrollbar.pack(side=tkinter.RIGHT, fill=tkinter.Y)
 messages_frame.pack(fill=tkinter.BOTH, expand=True)
 msg_list.pack(padx=7, pady=7, fill=tkinter.BOTH, expand=True)
