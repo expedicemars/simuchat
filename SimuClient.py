@@ -11,6 +11,7 @@ def recv():
             msg_list.configure(state='normal')
             msg_list.insert(tkinter.END, data + '\n')
             msg_list.configure(state='disabled')
+            msg_list.see("end")
         except OSError:
             break
 
