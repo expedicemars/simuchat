@@ -8,7 +8,9 @@ def recv():
     while True:
         try:
             data = client_socket.recv(1024).decode()  # Zkouší obdržet zprávu
-            msg_list.insert(tkinter.END, data)
+            msg_list.configure(state='normal')
+            msg_list.insert(tkinter.END, data + '\n')
+            msg_list.configure(state='disabled')
         except OSError:
             break
 
@@ -47,7 +49,7 @@ my_msg = tkinter.StringVar()
 scrollbar = tkinter.Scrollbar(messages_frame)
 
 # Listbox který obsahuje zprávy
-msg_list = tkinter.Listbox(messages_frame, yscrollcommand=scrollbar.set, bg="#26242f", fg='white')
+msg_list = tkinter.Text(messages_frame, yscrollcommand=scrollbar.set, bg="#26242f", fg='white')
 scrollbar.config(command=msg_list.yview)
 scrollbar.pack(side=tkinter.RIGHT, fill=tkinter.Y)
 messages_frame.pack(fill=tkinter.BOTH, expand=True)
