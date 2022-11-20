@@ -5,7 +5,7 @@ from datetime import datetime
 
 def accept_connection():
     while True:
-        print(f'[*] Čekám na připojení {SERVER_HOST}:{SERVER_PORT}')
+        print(f'[*] Čekám na připojení na adrese {SERVER_HOST}:{SERVER_PORT}')
         client, client_address = server_socket.accept()  # Přijme nové připojení
         print(f'[*]{client_address} se připojil.')
         client.send(bytes('Spojení se serverem bylo navázáno, pro vypnutí napiš quit, nyní vlož své jméno:', 'utf8'))
@@ -59,7 +59,7 @@ if __name__ == '__main__':
     addresses = {}
     clientslist = []
     # IP adresa serveru
-    SERVER_HOST = input('IP:')
+    SERVER_HOST = socket.gethostbyname(socket.gethostname())
     SERVER_PORT = int(input('Port:'))
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # Pouze přejmenované na server pro lepší vyznání
     server_socket.bind((SERVER_HOST, SERVER_PORT))  # Spojí host adresu a port dohromady
